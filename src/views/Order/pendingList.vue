@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border-b hover:bg-gray-50">
+          <tr class="border-b hover:bg-gray-50" v-for="item in pendingOrder">
             <td class="py-3 px-6 flex gap-2">
               <router-link :to="{ name: 'view' }">
                 <button
@@ -32,10 +32,12 @@
                 Verify
               </button>
             </td>
-            <td class="py-3 px-6 text-gray-800">111</td>
-            <td class="py-3 px-6 text-gray-800">100 Taka</td>
-            <td class="py-3 px-6 text-gray-800">50 Taka</td>
-            <td class="py-3 px-6 text-gray-800">01/02/2025</td>
+            <td class="py-3 px-6 text-gray-800">{{ item?.sale_code }}</td>
+            <td class="py-3 px-6 text-gray-800">{{ item?.total }} Taka</td>
+            <td class="py-3 px-6 text-gray-800">{{ item?.amount_due }} Taka</td>
+            <td class="py-3 px-6 text-gray-800">
+              {{ formatDate(item?.created_at) }}
+            </td>
             <td class="py-3 px-6 text-gray-800">BD</td>
             <td class="py-3 px-6 text-gray-800">Dhaka</td>
           </tr>
@@ -47,6 +49,37 @@
 
 <script setup>
 import MainLayout from "@/components/layouts/mainLayout.vue";
+import { apiBase } from "@/config";
+import { getTokenConfig } from "@/util/tokenConfig";
+import axios from "axios";
+import { onMounted, ref } from "vue";
+const loading = ref(false);
+const pendingOrder = ref();
+const getPendingOrder = async () => {
+  loading.value = true;
+  try {
+    const res = await axios.get(
+      `${apiBase}/admin/all-pending-order-list-paginated?page=1`,
+      getTokenConfig()
+    );
+    loading.value = false;
+    if (res.data) {
+      pendingOrder.value = res?.data?.data;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0]; // Formats as 'YYYY-MM-DD'
+};
+
+onMounted(async () => {
+  await getPendingOrder();
+});
 </script>
 
 <style lang="scss" scoped></style>
