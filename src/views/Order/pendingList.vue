@@ -17,9 +17,12 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="loading">
+            <td><h2 class="text-2xl text-left px-2">loading...</h2></td>
+          </tr>
           <tr class="border-b hover:bg-gray-50" v-for="item in pendingOrder">
             <td class="py-3 px-6 flex gap-2">
-              <router-link :to="{ name: 'view' }">
+              <router-link :to="{ name: 'view', params: { id: item?.id } }">
                 <button
                   class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
                 >
@@ -63,7 +66,7 @@ const getPendingOrder = async () => {
       getTokenConfig()
     );
     loading.value = false;
-    if (res.data) {
+    if (res?.data) {
       pendingOrder.value = res?.data?.data;
     }
   } catch (error) {
