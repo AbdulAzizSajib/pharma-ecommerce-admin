@@ -10,6 +10,7 @@ import Permission from "@/views/user/permission.vue";
 import PendingList from "@/views/Order/pendingList.vue";
 import OrderView from "@/views/Order/orderView.vue";
 import AllOrderList from "@/views/Order/allOrderList.vue";
+import OrderVerify from "@/views/Order/orderVerify.vue";
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: "/view/:id",
     name: "view",
     component: OrderView,
+  },
+  {
+    path: "/verify/:id",
+    name: "verify",
+    component: OrderVerify,
   },
 
   {

@@ -13,41 +13,22 @@
               <Icon icon="mdi:receipt-text" class="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
+              <h1 class="text-2xl font-bold text-gray-900">Order Processing</h1>
               <p class="text-sm text-gray-500 mt-1">Order ID: #{{ id }}</p>
             </div>
           </div>
           <div class="flex items-center space-x-3">
             <span
-              class="inline-flex items-center px-3 py-1 rounded-2xl text-sm font-medium bg-green-100 text-green-800"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800"
             >
-              Active Order
+              Pending Verification
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div
-        v-if="loading"
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-12"
-      >
-        <div class="flex flex-col items-center justify-center space-y-4">
-          <Icon
-            class="w-12 h-12 animate-spin text-blue-600"
-            icon="mage:reload"
-          />
-          <h3 class="text-xl font-medium text-gray-900">
-            Loading order details...
-          </h3>
-          <p class="text-gray-500">
-            Please wait while we fetch your order information
-          </p>
-        </div>
-      </div>
-
       <!-- Main Content -->
-      <div v-else class="space-y-8">
+      <div class="space-y-8">
         <!-- Product Details Section -->
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
@@ -118,10 +99,9 @@
                           v-if="
                             stockQuantity(product?.products) <= product.quantity
                           "
-                          class="text-xs text-red-600 font-medium mt-1 flex items-center gap-2"
+                          class="text-xs text-red-600 font-medium mt-1"
                         >
-                          <Icon class="size-4" icon="emojione:warning" /> Low
-                          Stock Alert
+                          ⚠️ Low Stock Alert
                         </div>
                       </div>
                     </div>
@@ -274,20 +254,20 @@
 
               <!-- Payment Status -->
               <div
-                class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200"
+                class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-2">
                     <Icon
                       icon="mdi:credit-card"
-                      class="w-5 h-5 text-blue-600"
+                      class="w-5 h-5 text-green-600"
                     />
-                    <span class="text-sm font-medium text-blue-800"
-                      >Payment Method</span
+                    <span class="text-sm font-medium text-green-800"
+                      >Payment Methods</span
                     >
                   </div>
                   <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-2xl font-bold text-xs bg-blue-100 text-blue-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                   >
                     {{ OrderInfo?.payment_method?.name }}
                   </span>
@@ -299,7 +279,7 @@
 
         <!-- Action Buttons -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <div class="flex flex-col sm:flex-row gap-4 justify-between">
             <button
               @click="goBack"
               class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
@@ -309,35 +289,152 @@
             </button>
 
             <button
-              class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+              @click="verifyOrder"
+              class="inline-flex items-center px-8 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm"
             >
               <Icon icon="mdi:check-circle" class="w-5 h-5 mr-2" />
-              Mark as Processed
-            </button>
-
-            <button
-              class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
-            >
-              <Icon icon="mdi:printer" class="w-5 h-5 mr-2" />
-              Print Order
+              Verify Order & Assign Delivery
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Delivery Assignment Modal -->
+    <a-modal
+      v-model:open="open"
+      :footer="null"
+      :width="600"
+      class="delivery-modal"
+    >
+      <div class="p-6">
+        <!-- Modal Header -->
+        <div class="flex items-center space-x-3 mb-6">
+          <div
+            class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+          >
+            <Icon icon="mdi:truck-delivery" class="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">Assign Delivery Man</h2>
+            <p class="text-sm text-gray-500">
+              Select a delivery person for this order
+            </p>
+          </div>
+        </div>
+
+        <!-- Delivery Man Selection -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Choose Delivery Person <span class="text-red-500">*</span>
+            </label>
+            <a-select
+              v-model:value="delivery_man_id"
+              show-search
+              :filterOption="false"
+              class="w-full"
+              placeholder="Select a delivery person..."
+              size="large"
+            >
+              <a-select-option
+                v-for="info in deliveryMan_info"
+                :key="info.id"
+                :value="info.id"
+              >
+                <div class="flex items-center justify-start space-x-3 py-1">
+                  <!-- <div
+                    class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
+                  >
+                    <Icon icon="mdi:account" class="w-4 h-4 text-blue-600" />
+                  </div> -->
+
+                  <div>
+                    <div class="font-medium text-gray-900">
+                      {{ info?.name }}
+                    </div>
+                    <div class="text-xs text-gray-500">Delivery Agent</div>
+                  </div>
+                </div>
+              </a-select-option>
+            </a-select>
+          </div>
+
+          <!-- Order Summary in Modal -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 class="text-sm font-medium text-gray-900 mb-3">
+              Order Summary
+            </h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Order ID:</span>
+                <span class="font-medium">#{{ id }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total Amount:</span>
+                <span class="font-bold text-blue-600"
+                  >৳{{ OrderInfo?.total?.toLocaleString() }}</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Items:</span>
+                <span class="font-medium"
+                  >{{ OrderInfo?.sale_products?.length }} products</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div
+          class="flex justify-between items-center pt-6 border-t border-gray-200 mt-6"
+        >
+          <button
+            @click="
+              () => {
+                open = false;
+              }
+            "
+            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+          >
+            <Icon icon="mdi:close" class="w-4 h-4 mr-2" />
+            Cancel
+          </button>
+
+          <a-popconfirm
+            title="Are you sure you want to confirm this order assignment?"
+            ok-text="Yes, Confirm"
+            cancel-text="Cancel"
+            @confirm="handleOrderConfirm"
+          >
+            <button
+              class="inline-flex items-center px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm"
+              :disabled="!delivery_man_id"
+              :class="{ 'opacity-50 cursor-not-allowed': !delivery_man_id }"
+            >
+              <Icon icon="mdi:check-circle" class="w-4 h-4 mr-2" />
+              Confirm Order Assignment
+            </button>
+          </a-popconfirm>
+        </div>
+      </div>
+    </a-modal>
   </MainLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import MainLayout from "@/components/layouts/mainLayout.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { Icon } from "@iconify/vue";
 import { apiBase, imgBase } from "@/config";
 import { getTokenConfig } from "@/util/tokenConfig";
+import { showNotification } from "@/utilities/common";
 
 const route = useRoute();
+const router = useRouter();
 const loading = ref(false);
 const id = route.params.id;
 const OrderInfo = ref(null);
@@ -376,6 +473,60 @@ onMounted(() => {
 const goBack = () => {
   window.history.back();
 };
+
+const open = ref(false);
+const verifyOrder = () => {
+  open.value = true;
+};
+
+const deliveryMan_info = ref([]);
+const getDelivaryMan = async () => {
+  try {
+    const res = await axios.get(
+      `${apiBase}/admin/delivery-man/search`,
+      getTokenConfig()
+    );
+    if (res.data) {
+      deliveryMan_info.value = res?.data;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const delivery_man_id = ref();
+const handleOrderConfirm = async () => {
+  if (!delivery_man_id.value) {
+    return showNotification("warning", "Please select delivery man");
+  }
+  try {
+    const res = await axios.post(
+      `${apiBase}/admin/sale/verified/${id}`,
+      {
+        delivery_man_id: delivery_man_id.value,
+      },
+      getTokenConfig()
+    );
+
+    if (res.data?.status === "success") {
+      showNotification("success", res?.data?.message);
+      open.value = false;
+      delivery_man_id.value = "";
+      router.push({ name: "pending-list" });
+    } else {
+      showNotification("error", res?.data?.message);
+      open.value = false;
+      delivery_man_id.value = "";
+    }
+    console.log(res.data);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+onMounted(async () => {
+  await getDelivaryMan();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -401,5 +552,31 @@ const goBack = () => {
 
 .overflow-x-auto::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Modal styling */
+:global(.delivery-modal .ant-modal-content) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+:global(.delivery-modal .ant-modal-header) {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0;
+}
+
+:global(.delivery-modal .ant-modal-body) {
+  padding: 0;
+}
+
+/* Select styling */
+:global(.ant-select-selector) {
+  border-radius: 8px !important;
+  border: 1px solid #d1d5db !important;
+}
+
+:global(.ant-select-focused .ant-select-selector) {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.1) !important;
 }
 </style>
