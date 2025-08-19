@@ -81,10 +81,10 @@
                   />
                 </svg>
               </div>
-              <a-input-password
+              <input
                 placeholder="Password"
                 class="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
-                v-model:value="form.password"
+                v-model="form.password"
               />
             </div>
           </a-form-item>
