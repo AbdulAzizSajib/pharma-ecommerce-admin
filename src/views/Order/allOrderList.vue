@@ -107,6 +107,16 @@
                 >
                   Status
                 </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Delivery Status
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  payment Status
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -198,25 +208,94 @@
                   </div>
                 </td>
 
-                <!-- Status -->
+                <!-- Verify Status -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     :class="{
                       'bg-green-100 text-green-800': item?.verify_status == 1,
-                      'bg-orange-100 text-orange-800': item?.verify_status != 1,
+                      'bg-orange-100 text-orange-800': item?.verify_status == 0,
+                      'bg-red-100 text-red-800': item?.verify_status == 2,
                     }"
                   >
-                    <Icon
-                      :icon="
-                        item?.verify_status == 1
-                          ? 'mdi:check-circle'
-                          : 'mdi:clock-outline'
-                      "
-                      class="w-3 h-3 mr-1"
-                    />
-                    {{ item?.verify_status == 1 ? "Approved" : "Pending" }}
+                    {{
+                      (item?.verify_status == 0 && "Pending") ||
+                      (item?.verify_status == 1 && "Approved") ||
+                      (item?.verify_status == 2 && "Cancel")
+                    }}
                   </span>
+                </td>
+                <!-- Delivery Status -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <!-- {{ item?.delivery_status }} -->
+                  <span
+                    v-if="item?.delivery_status == 1"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    Store Arrived
+                  </span>
+                  <span
+                    v-else-if="item?.delivery_status == 2"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    Start Journey
+                  </span>
+                  <span
+                    v-else-if="item?.delivery_status == 3"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    delivered
+                  </span>
+
+                  <span
+                    v-else-if="item?.delivery_status == 4"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                  >
+                    Not Reachable
+                  </span>
+                  <span
+                    v-else-if="item?.delivery_status == 5"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                  >
+                    Not Received
+                  </span>
+                </td>
+                <!-- payment Status -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <Span
+                    v-if="
+                      item?.delivery_status == 3 &&
+                      item?.sale_transaction == null
+                    "
+                  >
+                    Delivery Completed but payment not transferred
+                  </Span>
+                  <a-popconfirm
+                    v-else
+                    title="Are you sure receive money?"
+                    :disabled="item?.sale_transaction?.receive_status == 1"
+                    @confirm="handleConfirm_Receive(item?.sale_transaction?.id)"
+                    placement="top"
+                  >
+                    <!-- {{ item?.sale_transaction?.receive_status }} -->
+                    <button
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      :class="{
+                        'bg-green-100 text-green-800':
+                          item?.sale_transaction?.receive_status == 1,
+                        'bg-orange-100 text-orange-800':
+                          item?.sale_transaction?.receive_status == 0,
+                      }"
+                    >
+                      {{
+                        item?.sale_transaction
+                          ? item?.sale_transaction?.receive_status == 1
+                            ? "Received"
+                            : "Not Received"
+                          : "-"
+                      }}
+                    </button>
+                  </a-popconfirm>
                 </td>
               </tr>
 
@@ -357,6 +436,7 @@
 import MainLayout from "@/components/layouts/mainLayout.vue";
 import { apiBase } from "@/config";
 import { getTokenConfig } from "@/util/tokenConfig";
+import { showNotification } from "@/utilities/common";
 import { Icon } from "@iconify/vue";
 import axios from "axios";
 import { onMounted, ref } from "vue";
@@ -370,6 +450,24 @@ const currentPage = ref(1);
 const pagination = async (page) => {
   currentPage.value = page;
   await getAllOrder();
+};
+
+const handleConfirm_Receive = async (id) => {
+  try {
+    const res = await axios.post(
+      `${apiBase}/admin/payment-received/${id}`,
+      {
+        receive_status: 1,
+      },
+      getTokenConfig()
+    );
+    if (res.data.status === "success") {
+      showNotification("success", res.data.message);
+      await getAllOrder();
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 const getAllOrder = async () => {
