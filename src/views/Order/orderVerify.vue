@@ -287,14 +287,51 @@
               <Icon icon="mdi:arrow-left" class="w-5 h-5 mr-2" />
               Go Back
             </button>
+            <div class="flex gap-4 items-center">
+              <button
+                @click="verifyOrder"
+                class="inline-flex items-center px-6 py-2.5 border border-transparent rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm"
+              >
+                <Icon icon="mdi:check-circle" class="w-5 h-5 mr-2" />
+                Verify Order & Assign Delivery
+              </button>
 
-            <button
-              @click="verifyOrder"
-              class="inline-flex items-center px-8 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm"
-            >
-              <Icon icon="mdi:check-circle" class="w-5 h-5 mr-2" />
-              Verify Order & Assign Delivery
-            </button>
+              <a-popconfirm
+                title="Are you sure cancel this order?"
+                ok-text="Yes, Cancel"
+                cancel-text="No, Keep"
+                @confirm="handleCancelOrder(OrderInfo.id)"
+                @cancel="() => {}"
+              >
+                <button
+                  class="rounded-lg text-base transition-colors px-6 py-2.5 inline-flex items-center"
+                  :class="{
+                    'bg-yellow-200  border-yellow-200 hover:bg-yellow-300':
+                      OrderInfo?.verify_status == 0 ||
+                      OrderInfo?.verify_status == null,
+                    'bg-green-100 text-green-700 border-green-200 cursor-not-allowed':
+                      OrderInfo?.verify_status == 1,
+                    'bg-red-100 text-red-700 border-red-200 cursor-not-allowed':
+                      OrderInfo?.verify_status == 2,
+                  }"
+                >
+                  {{
+                    OrderInfo?.customer_id === null
+                      ? "Guest Order"
+                      : "User Order"
+                  }}
+
+                  {{
+                    OrderInfo?.verify_status == 0 ||
+                    OrderInfo?.verify_status == null
+                      ? "Pending"
+                      : OrderInfo?.verify_status == 1
+                      ? "Confirmed"
+                      : "Cancelled"
+                  }}
+                </button>
+              </a-popconfirm>
+            </div>
           </div>
         </div>
       </div>
@@ -519,6 +556,18 @@ const handleOrderConfirm = async () => {
       delivery_man_id.value = "";
     }
     console.log(res.data);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const handleCancelOrder = async (id) => {
+  try {
+    const res = await axios.post(`${apiBase}/sale/request-to-suspend/${id}`);
+    if (res.data) {
+      showNotification("success", res.data.message);
+      router.push({ name: "pending-list" });
+    }
   } catch (error) {
     console.log(error.message);
   }

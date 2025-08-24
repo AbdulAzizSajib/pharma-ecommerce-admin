@@ -80,7 +80,7 @@
                 <th
                   class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Actions
+                  Order View
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -105,13 +105,14 @@
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Status
+                  Order Status
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Delivery Status
                 </th>
+
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
@@ -152,7 +153,6 @@
                       title="View Order Details"
                     >
                       <Icon icon="mdi:eye" class="w-4 h-4 mr-2" />
-                      View Order
                     </button>
                   </router-link>
                 </td>
@@ -160,10 +160,6 @@
                 <!-- Order Date -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <Icon
-                      icon="mdi:calendar"
-                      class="w-4 h-4 text-gray-400 mr-2"
-                    />
                     <div>
                       <div class="text-sm text-gray-900">
                         {{ formatDate(item?.sale_date) }}
@@ -178,10 +174,6 @@
                 <!-- Order Code -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <Icon
-                      icon="mdi:barcode"
-                      class="w-4 h-4 text-gray-400 mr-2"
-                    />
                     <span class="text-sm font-medium text-gray-900">
                       {{ item?.sale_code || "N/A" }}
                     </span>
@@ -191,7 +183,6 @@
                 <!-- Country -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <Icon icon="mdi:earth" class="w-4 h-4 text-gray-400 mr-2" />
                     <span class="text-sm text-gray-900">
                       {{ item?.billing_address?.country?.name || "N/A" }}
                     </span>
@@ -201,17 +192,16 @@
                 <!-- City -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <Icon icon="mdi:city" class="w-4 h-4 text-gray-400 mr-2" />
                     <span class="text-sm text-gray-900">
                       {{ item?.billing_address?.city?.name || "N/A" }}
                     </span>
                   </div>
                 </td>
 
-                <!-- Verify Status -->
+                <!--Order Verify Status -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
                     :class="{
                       'bg-green-100 text-green-800': item?.verify_status == 1,
                       'bg-orange-100 text-orange-800': item?.verify_status == 0,
@@ -230,45 +220,47 @@
                   <!-- {{ item?.delivery_status }} -->
                   <span
                     v-if="item?.delivery_status == 1"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-green-100 text-green-800"
                   >
                     Store Arrived
                   </span>
                   <span
                     v-else-if="item?.delivery_status == 2"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-green-100 text-green-800"
                   >
                     Start Journey
                   </span>
                   <span
                     v-else-if="item?.delivery_status == 3"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-green-100 text-green-800"
                   >
                     delivered
                   </span>
 
                   <span
                     v-else-if="item?.delivery_status == 4"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-orange-100 text-orange-800"
                   >
                     Not Reachable
                   </span>
                   <span
                     v-else-if="item?.delivery_status == 5"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-orange-100 text-orange-800"
                   >
                     Not Received
                   </span>
                 </td>
+
                 <!-- payment Status -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <Span
+                    class="text-white bg-red-600 px-2.5 py-1 rounded-lg text-xs font-medium"
                     v-if="
                       item?.delivery_status == 3 &&
                       item?.sale_transaction == null
                     "
                   >
-                    Delivery Completed but payment not transferred
+                    Delivered but payment not transferred
                   </Span>
                   <a-popconfirm
                     v-else
@@ -277,9 +269,8 @@
                     @confirm="handleConfirm_Receive(item?.sale_transaction?.id)"
                     placement="top"
                   >
-                    <!-- {{ item?.sale_transaction?.receive_status }} -->
                     <button
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium"
                       :class="{
                         'bg-green-100 text-green-800':
                           item?.sale_transaction?.receive_status == 1,
@@ -350,81 +341,6 @@
               @change="pagination"
               class="flex items-center"
             />
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Stats Cards -->
-      <div
-        v-if="!loading && AllOrder && AllOrder.length > 0"
-        class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8"
-      >
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div
-              class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
-            >
-              <Icon
-                icon="mdi:format-list-bulleted"
-                class="w-5 h-5 text-blue-600"
-              />
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Total Orders</p>
-              <p class="text-2xl font-bold text-gray-900">
-                {{ backupData?.total?.toLocaleString() }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div
-              class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
-            >
-              <Icon icon="mdi:check-circle" class="w-5 h-5 text-green-600" />
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Approved Orders</p>
-              <p class="text-2xl font-bold text-gray-900">
-                {{
-                  AllOrder.filter((order) => order.verify_status == 1).length
-                }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div
-              class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
-            >
-              <Icon icon="mdi:clock-outline" class="w-5 h-5 text-orange-600" />
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Pending Orders</p>
-              <p class="text-2xl font-bold text-gray-900">
-                {{
-                  AllOrder.filter((order) => order.verify_status != 1).length
-                }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div
-              class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"
-            >
-              <Icon icon="mdi:file-document" class="w-5 h-5 text-purple-600" />
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Current Page</p>
-              <p class="text-2xl font-bold text-gray-900">{{ currentPage }}</p>
-            </div>
           </div>
         </div>
       </div>

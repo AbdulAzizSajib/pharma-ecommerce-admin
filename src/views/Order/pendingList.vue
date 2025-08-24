@@ -70,10 +70,11 @@
                 >
                   #
                 </th>
+
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Actions
+                  User / Guest
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -95,7 +96,7 @@
                 >
                   Order Date
                 </th>
-                <th
+                <!-- <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Country
@@ -104,6 +105,11 @@
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   City
+                </th> -->
+                <th
+                  class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -124,33 +130,15 @@
                   </div>
                 </td>
 
-                <!-- Actions -->
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center space-x-2">
-                    <router-link
-                      :to="{ name: 'view', params: { id: item?.id } }"
-                    >
-                      <button
-                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-                        title="View Order Details"
-                      >
-                        <Icon icon="mdi:eye" class="w-4 h-4" />
-                      </button>
-                    </router-link>
-                    <router-link
-                      :to="{ name: 'verify', params: { id: item?.id } }"
-                    >
-                      <button
-                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
-                        title="Verify Order"
-                      >
-                        <Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
-                        <span class="hidden sm:inline">Verify</span>
-                      </button>
-                    </router-link>
+                  <div class="flex items-center">
+                    <div>
+                      <div class="text-sm font-semibold text-gray-900">
+                        {{ item?.customer_id === null ? "Guest " : "User " }}
+                      </div>
+                    </div>
                   </div>
                 </td>
-
                 <!-- Order Code -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
@@ -177,15 +165,6 @@
                   <div class="text-sm font-medium text-gray-900">
                     ৳{{ item?.amount_due?.toLocaleString() }}
                   </div>
-                  <!-- <div
-                    v-if="item?.amount_due > 0"
-                    class="text-xs text-red-600 font-medium"
-                  >
-                    Partial Payment
-                  </div>
-                  <div v-else class="text-xs text-green-600 font-medium">
-                    Fully Paid
-                  </div> -->
                 </td>
 
                 <!-- Created Date -->
@@ -199,22 +178,48 @@
                 </td>
 
                 <!-- Country -->
-                <td class="px-6 py-4 whitespace-nowrap">
+                <!-- <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <Icon icon="mdi:earth" class="w-4 h-4 text-gray-400 mr-2" />
                     <span class="text-sm text-gray-900">
                       {{ item?.billing_address?.country?.name || "N/A" }}
                     </span>
                   </div>
-                </td>
+                </td> -->
 
                 <!-- City -->
-                <td class="px-6 py-4 whitespace-nowrap">
+                <!-- <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <Icon icon="mdi:city" class="w-4 h-4 text-gray-400 mr-2" />
                     <span class="text-sm text-gray-900">
                       {{ item?.billing_address?.city?.name || "N/A" }}
                     </span>
+                  </div>
+                </td> -->
+                <!-- Actions -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center space-x-2">
+                    <router-link
+                      :to="{ name: 'view', params: { id: item?.id } }"
+                    >
+                      <button
+                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                        title="View Order Details"
+                      >
+                        <Icon icon="mdi:eye" class="w-4 h-4" />
+                      </button>
+                    </router-link>
+                    <router-link
+                      :to="{ name: 'verify', params: { id: item?.id } }"
+                    >
+                      <button
+                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
+                        title="Verify Order"
+                      >
+                        <Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
+                        <span class="hidden sm:inline">Verify</span>
+                      </button>
+                    </router-link>
                   </div>
                 </td>
               </tr>
@@ -332,6 +337,18 @@ const formatTime = (dateString) => {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+const handleCancelOrder = async (id) => {
+  try {
+    const res = await axios.post(`${apiBase}/sale/request-to-suspend/${id}`);
+    if (res.data) {
+      showNotification("success", res.data.message);
+      await getOrderInfo();
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 onMounted(async () => {
