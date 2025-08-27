@@ -32,7 +32,15 @@
         </div>
       </div>
 
-      <!-- Orders Table -->
+      <div class="flex flex-col items-start mb-4">
+        <h1 class="font-semibold">Search Order</h1>
+        <a-input
+          v-model:value="searchInfo"
+          placeholder="Search by Order ID, Code, Country, City..."
+          class="text-black border border-gray-300 rounded-lg w-full sm:w-[40%] md:w-[30%] lg:w-[20%] px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-500"
+          @change="getAllOrder"
+        />
+      </div>
       <div
         class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
       >
@@ -386,11 +394,14 @@ const handleConfirm_Receive = async (id) => {
   }
 };
 
+const searchInfo = ref("");
 const getAllOrder = async () => {
   loading.value = true;
   try {
     const res = await axios.get(
-      `${apiBase}/admin/all-order-list-paginated?page=${currentPage.value}`,
+      `${apiBase}/admin/all-order-list-paginated?page=${
+        currentPage.value
+      }&search=${searchInfo.value || ""}`,
       getTokenConfig()
     );
     loading.value = false;
