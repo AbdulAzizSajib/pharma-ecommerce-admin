@@ -12,7 +12,7 @@
         <div class="logo-wrapper">
           <img
             v-if="!collapsed"
-            src="/src/assets/images/aa.png"
+            src="/src/assets/images/fav.png"
             alt="Logo"
             class="logo-image"
           />
@@ -23,7 +23,7 @@
 
         <div v-if="!collapsed" class="brand-text">
           <h2 class="brand-title">
-            Pharma<span class="brand-subtitle">Ecommerce</span>
+            Ousad<span class="brand-subtitle">Bazar</span>
           </h2>
           <span class="admin-label">Admin Panel</span>
         </div>

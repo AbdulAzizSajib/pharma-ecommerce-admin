@@ -141,12 +141,14 @@
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-gray-900">{{
-                      product.quantity
+                      product?.total_quantity
                     }}</span>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-gray-900"
-                      >৳{{ product.price.toLocaleString() }}</span
+                      >৳{{
+                        product.ecom_final_selling_price.toLocaleString()
+                      }}</span
                     >
                   </td>
                   <td class="px-6 py-4 text-center">
@@ -157,7 +159,7 @@
                   <td class="px-6 py-4 text-center">
                     <div class="flex justify-center">
                       <img
-                        :src="`${imgBase}/${product?.products?.product_images[0].path}`"
+                        :src="`${imgBase}/${product?.products?.product_images[0]?.path}`"
                         alt="Product Image"
                         class="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm"
                       />
@@ -247,19 +249,12 @@
               </h2>
             </div>
             <div class="p-6 space-y-4">
-              <div class="flex justify-between items-center py-2">
+              <!-- <div class="flex justify-between items-center py-2">
                 <span class="text-gray-600">Subtotal</span>
                 <span class="text-lg font-medium text-gray-900"
                   >৳{{ OrderInfo?.sub_total?.toLocaleString() }}</span
                 >
-              </div>
-
-              <div class="flex justify-between items-center py-2">
-                <span class="text-gray-600">Shipping Charge</span>
-                <span class="text-lg font-medium text-gray-900"
-                  >৳{{ OrderInfo?.shipping_cost?.toLocaleString() }}</span
-                >
-              </div>
+              </div> -->
 
               <div class="border-t border-gray-200 pt-4">
                 <div class="flex justify-between items-center">
@@ -306,20 +301,6 @@
             >
               <Icon icon="mdi:arrow-left" class="w-5 h-5 mr-2" />
               Go Back
-            </button>
-
-            <button
-              class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-            >
-              <Icon icon="mdi:check-circle" class="w-5 h-5 mr-2" />
-              Mark as Processed
-            </button>
-
-            <button
-              class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
-            >
-              <Icon icon="mdi:printer" class="w-5 h-5 mr-2" />
-              Print Order
             </button>
           </div>
         </div>

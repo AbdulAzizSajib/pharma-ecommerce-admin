@@ -83,7 +83,7 @@
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  User / Guest
+                  Name (User / Guest)
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -143,7 +143,11 @@
                   <div class="flex items-center">
                     <div>
                       <div class="text-sm font-semibold text-gray-900">
-                        {{ item?.customer_id === null ? "Guest " : "User " }}
+                        {{ item?.sold_user?.name }}
+                        <br />
+                        {{ item?.sold_user?.phone }}
+
+                        {{ item?.customer_id === null ? "Guest " : " " }}
                       </div>
                     </div>
                   </div>

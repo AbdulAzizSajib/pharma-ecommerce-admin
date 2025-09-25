@@ -121,12 +121,14 @@
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-gray-900">{{
-                      product.quantity
+                      product?.total_quantity
                     }}</span>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-gray-900"
-                      >৳{{ product.price.toLocaleString() }}</span
+                      >৳{{
+                        product.ecom_final_selling_price.toLocaleString()
+                      }}</span
                     >
                   </td>
                   <td class="px-6 py-4 text-center">
@@ -137,7 +139,7 @@
                   <td class="px-6 py-4 text-center">
                     <div class="flex justify-center">
                       <img
-                        :src="`${imgBase}/${product?.products?.product_images[0].path}`"
+                        :src="`${imgBase}/${product?.products?.product_images[0]?.path}`"
                         alt="Product Image"
                         class="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm"
                       />
