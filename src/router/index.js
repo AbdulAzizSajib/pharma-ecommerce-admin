@@ -11,6 +11,7 @@ import PendingList from "@/views/Order/pendingList.vue";
 import OrderView from "@/views/Order/orderView.vue";
 import AllOrderList from "@/views/Order/allOrderList.vue";
 import OrderVerify from "@/views/Order/orderVerify.vue";
+import Receipt from "@/views/Order/receipt.vue";
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: "/view/:id",
     name: "view",
     component: OrderView,
+  },
+  {
+    path: "/receipt/:id",
+    name: "receipt",
+    component: Receipt,
   },
   {
     path: "/verify/:id",

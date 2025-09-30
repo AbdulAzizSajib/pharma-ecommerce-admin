@@ -302,6 +302,20 @@
               <Icon icon="mdi:arrow-left" class="w-5 h-5 mr-2" />
               Go Back
             </button>
+
+            <router-link
+              :to="{ name: 'receipt', params: { id: OrderInfo?.id } }"
+            >
+              <button
+                class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-base font-medium text-gray-700"
+              >
+                <Icon
+                  icon="material-symbols-light:print-rounded"
+                  class="size-8 mr-2"
+                />
+                Print
+              </button>
+            </router-link>
           </div>
         </div>
       </div>
